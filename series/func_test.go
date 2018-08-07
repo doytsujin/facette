@@ -69,28 +69,42 @@ func init() {
 	}
 }
 
+func Test_Consolidate_InvalidFunction(t *testing.T) {
+	_, err := testBucket.Consolidate(-1)
+	if err == nil {
+		t.Logf("\nExpected error but got none")
+		t.Fail()
+	}
+}
+
 func Test_Consolidate_Average(t *testing.T) {
-	assert.Equal(t, Point{Time: time.Unix(60, 0), Value: 11.75}, testBucket.Consolidate(ConsolidateAverage))
+	p, _ := testBucket.Consolidate(ConsolidateAverage)
+	assert.Equal(t, Point{Time: time.Unix(60, 0), Value: 11.75}, p)
 }
 
 func Test_Consolidate_Sum(t *testing.T) {
-	assert.Equal(t, Point{Time: time.Unix(120, 0), Value: 47}, testBucket.Consolidate(ConsolidateSum))
+	p, _ := testBucket.Consolidate(ConsolidateSum)
+	assert.Equal(t, Point{Time: time.Unix(120, 0), Value: 47}, p)
 }
 
 func Test_Consolidate_First(t *testing.T) {
-	assert.Equal(t, Point{Time: time.Unix(0, 0), Value: 17}, testBucket.Consolidate(ConsolidateFirst))
+	p, _ := testBucket.Consolidate(ConsolidateFirst)
+	assert.Equal(t, Point{Time: time.Unix(0, 0), Value: 17}, p)
 }
 
 func Test_Consolidate_Last(t *testing.T) {
-	assert.Equal(t, Point{Time: time.Unix(120, 0), Value: 2}, testBucket.Consolidate(ConsolidateLast))
+	p, _ := testBucket.Consolidate(ConsolidateLast)
+	assert.Equal(t, Point{Time: time.Unix(120, 0), Value: 2}, p)
 }
 
 func Test_Consolidate_Min(t *testing.T) {
-	assert.Equal(t, Point{Time: time.Unix(120, 0), Value: 2}, testBucket.Consolidate(ConsolidateMin))
+	p, _ := testBucket.Consolidate(ConsolidateMin)
+	assert.Equal(t, Point{Time: time.Unix(120, 0), Value: 2}, p)
 }
 
 func Test_Consolidate_Max(t *testing.T) {
-	assert.Equal(t, Point{Time: time.Unix(30, 0), Value: 25}, testBucket.Consolidate(ConsolidateMax))
+	p, _ := testBucket.Consolidate(ConsolidateMax)
+	assert.Equal(t, Point{Time: time.Unix(30, 0), Value: 25}, p)
 }
 
 func Test_Normalize_Average(t *testing.T) {

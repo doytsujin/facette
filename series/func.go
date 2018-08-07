@@ -35,92 +35,43 @@ type bucket struct {
 	points    []Point
 }
 
-// Consolidate consolidates points buckets based on consolidation function.
-func (b bucket) Consolidate(consolidation int) Point {
-	point := Point{
-		Value: Value(math.NaN()),
-		Time:  b.startTime,
+// Consolidate consolidates bucket points using consolidation function f.
+func (b bucket) Consolidate(f int) (Point, error) {
+	if len(b.points) == 0 {
+		return Point{
+			Value: Value(math.NaN()),
+			Time:  b.startTime,
+		}, nil
 	}
 
-	length := len(b.points)
-	if length == 0 {
-		return point
-	}
-
-	switch consolidation {
-	case ConsolidateAverage:
-		sum := 0.0
-		sumCount := 0
-		for _, p := range b.points {
-			if p.Value.IsNaN() {
-				continue
-			}
-
-			sum += float64(p.Value)
-			sumCount++
-		}
-
-		if sumCount > 0 {
-			point.Value = Value(sum / float64(sumCount))
-		}
-
-		if length == 1 {
-			point.Time = b.points[0].Time
-		} else {
-			// Interpolate median time
-			point.Time = b.points[0].Time.Add(b.points[length-1].Time.Sub(b.points[0].Time) / 2)
-		}
-
-	case ConsolidateSum:
-		sum := 0.0
-		sumCount := 0
-		for _, p := range b.points {
-			if p.Value.IsNaN() {
-				continue
-			}
-
-			sum += float64(p.Value)
-			sumCount++
-		}
-
-		if sumCount > 0 {
-			point.Value = Value(sum)
-		}
-
-		point.Time = b.points[length-1].Time
-
-	case ConsolidateFirst:
-		point = b.points[0]
-
-	case ConsolidateLast:
-		point = b.points[length-1]
+	switch f {
+	case ConsolidateMin:
+		return b.consolidateMin(), nil
 
 	case ConsolidateMax:
-		for _, p := range b.points {
-			if !p.Value.IsNaN() && p.Value > point.Value || point.Value.IsNaN() {
-				point = p
-			}
-		}
+		return b.consolidateMax(), nil
 
-	case ConsolidateMin:
-		for _, p := range b.points {
-			if !p.Value.IsNaN() && p.Value < point.Value || point.Value.IsNaN() {
-				point = p
-			}
-		}
+	case ConsolidateAverage:
+		return b.consolidateAverage(), nil
+
+	case ConsolidateSum:
+		return b.consolidateSum(), nil
+
+	case ConsolidateFirst:
+		return b.consolidateFirst(), nil
+
+	case ConsolidateLast:
+		return b.consolidateLast(), nil
+
+	default:
+		return Point{}, ErrInvalidConsolidationFunction
 	}
-
-	return point
 }
 
 // Normalize aligns multiple point series on a common time step, consolidates points samples if necessary.
-func Normalize(
-	series []Series,
-	startTime, endTime time.Time,
-	sample int,
-	consolidation int,
-	interpolate bool,
-) ([]Series, error) {
+func Normalize(series []Series, startTime, endTime time.Time, sample, f int, interpolate bool) ([]Series, error) {
+	var err error
+
 	if sample <= 0 {
 		return nil, ErrInvalidSample
 	}
@@ -176,7 +127,9 @@ func Normalize(
 		lastKnown := -1
 
 		for j := range buckets[i] {
-			result[i].Points[j] = buckets[i][j].Consolidate(consolidation)
+			if result[i].Points[j], err = buckets[i][j].Consolidate(f); err != nil {
+				return nil, err
+			}
 
 			if interpolate {
 				// Keep reference of last and next known points
@@ -229,6 +182,102 @@ func Average(series []Series) (Series, error) {
 // Sum returns a new series summing each datapoints.
 func Sum(series []Series) (Series, error) {
 	return applyOperator(series, OperatorSum)
+}
+
+func (b bucket) consolidateMin() Point {
+	point := Point{
+		Value: Value(math.NaN()),
+		Time:  b.startTime,
+	}
+
+	for _, p := range b.points {
+		if !p.Value.IsNaN() && p.Value < point.Value || point.Value.IsNaN() {
+			point = p
+		}
+	}
+
+	return point
+}
+
+func (b bucket) consolidateMax() Point {
+	point := Point{
+		Value: Value(math.NaN()),
+		Time:  b.startTime,
+	}
+
+	for _, p := range b.points {
+		if !p.Value.IsNaN() && p.Value > point.Value || point.Value.IsNaN() {
+			point = p
+		}
+	}
+
+	return point
+}
+
+func (b bucket) consolidateAverage() Point {
+	point := Point{
+		Value: Value(math.NaN()),
+		Time:  b.startTime,
+	}
+	length := len(b.points)
+	sum := 0.0
+	sumCount := 0
+
+	for _, p := range b.points {
+		if p.Value.IsNaN() {
+			continue
+		}
+
+		sum += float64(p.Value)
+		sumCount++
+	}
+
+	if sumCount > 0 {
+		point.Value = Value(sum / float64(sumCount))
+	}
+
+	if length == 1 {
+		point.Time = b.points[0].Time
+	} else {
+		// Interpolate median time
+		point.Time = b.points[0].Time.Add(b.points[length-1].Time.Sub(b.points[0].Time) / 2)
+	}
+
+	return point
+}
+
+func (b bucket) consolidateSum() Point {
+	point := Point{
+		Value: Value(math.NaN()),
+		Time:  b.startTime,
+	}
+	sum := 0.0
+	sumCount := 0
+
+	for _, p := range b.points {
+		if p.Value.IsNaN() {
+			continue
+		}
+
+		sum += float64(p.Value)
+		sumCount++
+	}
+
+	if sumCount > 0 {
+		point.Value = Value(sum)
+	}
+
+	point.Time = b.points[len(b.points)-1].Time
+
+	return point
+}
+
+func (b bucket) consolidateFirst() Point {
+	return b.points[0]
+}
+
+func (b bucket) consolidateLast() Point {
+	return b.points[len(b.points)-1]
 }
 
 func applyOperator(series []Series, operator int) (Series, error) {
