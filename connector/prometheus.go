@@ -16,6 +16,7 @@ import (
 	prometheus "github.com/prometheus/client_golang/api"
 	promapi "github.com/prometheus/client_golang/api/prometheus/v1"
 	prommodel "github.com/prometheus/common/model"
+	promlabels "github.com/prometheus/prometheus/pkg/labels"
 )
 
 var (
@@ -136,23 +137,26 @@ func (c *prometheusConnector) Points(q *series.Query) ([]series.Series, error) {
 	api := promapi.NewAPI(c.client)
 
 	for _, qs := range q.Series {
-		c.log.Debug("sending query to Prometheus server: %s{%s=%q,%s=%q}",
-			c.metrics[qs.Source+qs.Metric].metric,
-			c.metrics[qs.Source+qs.Metric].label.Name,
-			c.metrics[qs.Source+qs.Metric].label.Value,
+		if _, ok := c.metrics[qs.Source+qs.Metric]; !ok {
+			return nil, fmt.Errorf("no series matching source %q and metric %q found in connector",
+				qs.Source, qs.Metric)
+		}
+
+		queryLabels := promlabels.FromStrings(
+			string(c.metrics[qs.Source+qs.Metric].label.Name),
+			string(c.metrics[qs.Source+qs.Metric].label.Value),
 			c.sourceLabel,
 			qs.Source,
 		)
 
+		c.log.Debug("sending query to Prometheus server: %s%s",
+			c.metrics[qs.Source+qs.Metric].metric,
+			queryLabels.String(),
+		)
+
 		res, err := api.QueryRange(
 			context.Background(),
-			fmt.Sprintf("%s{%s=%q,%s=%q}",
-				c.metrics[qs.Source+qs.Metric].metric,
-				c.metrics[qs.Source+qs.Metric].label.Name,
-				c.metrics[qs.Source+qs.Metric].label.Value,
-				c.sourceLabel,
-				qs.Source,
-			),
+			fmt.Sprintf("%s%s", c.metrics[qs.Source+qs.Metric].metric, queryLabels.String()),
 			promapi.Range{
 				Start: q.StartTime,
 				End:   q.EndTime,
