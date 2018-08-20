@@ -6,10 +6,11 @@
 
         <template v-else>
             <v-message :icon="['far', 'clock']" v-if="loading">{{ $t("label.points.loading") }}</v-message>
+
             <v-message icon="exclamation-triangle" type="warning"
                 v-else-if="partial">{{ $t("label.points.partial") }}</v-message>
 
-            <v-graph-menu></v-graph-menu>
+            <!-- <v-graph-menu></v-graph-menu> -->
 
             <v-graph-slides ref="slides"></v-graph-slides>
 
@@ -250,13 +251,13 @@ export default {
                     this.chart.canvas.style.cursor = "crosshair";
                     this.$refs.tooltip.update(e, this.chart);
 
-                    this.$eventbus.$emit("graph-cursor", this.chart.xScale.invert(e.layerX - this.chart.area.left));
+                    this.$events.$emit("graph-cursor", this.chart.xScale.invert(e.layerX - this.chart.area.left));
                 } else {
                     this.updateCursor(null);
                     this.chart.canvas.style.cursor = null;
                     this.$refs.tooltip.update(null, this.chart);
 
-                    this.$eventbus.$emit("graph-cursor", null);
+                    this.$events.$emit("graph-cursor", null);
                 }
             }
         },
@@ -372,8 +373,8 @@ export default {
         },
     },
     created() {
-        this.$eventbus.$on("graph-action", this.exec);
-        this.$eventbus.$on("graph-cursor", this.updateCursor);
+        this.$events.$on("graph-action", this.exec);
+        this.$events.$on("graph-cursor", this.updateCursor);
 
         // Save original options
         this.originalOptions = Object.assign({}, this.options);
@@ -383,8 +384,8 @@ export default {
         window.addEventListener("resize", debounce(this.handleResize.bind(this), 200));
     },
     beforeDestroy() {
-        this.$eventbus.$off("graph-action", this.exec);
-        this.$eventbus.$off("graph-cursor", this.updateCursor);
+        this.$events.$off("graph-action", this.exec);
+        this.$events.$off("graph-cursor", this.updateCursor);
 
         this.unobserve();
         window.removeEventListener("resize", this.handleResize);
@@ -474,48 +475,6 @@ export default {
 
     .v-graph-menu {
         padding: 0.5rem;
-    }
-}
-
-body {
-    &.dark .v-graph {
-        &.active,
-        &:hover .v-graph-slides {
-            outline-color: var(--dark-main-foreground-color-light);
-        }
-
-        /deep/ .v-button {
-            > a {
-                background-color: var(--dark-actionbar-background-color);
-                color: var(--dark-main-foreground-color);
-            }
-
-            &:hover > a,
-            &.focus > a,
-            > a:focus {
-                background-color: var(--dark-actionbar-highlight-color);
-            }
-        }
-    }
-
-    &.light .v-graph {
-        &.active,
-        &:hover .v-graph-slides {
-            outline-color: var(--light-main-foreground-color-light);
-        }
-
-        /deep/ .v-button {
-            > a {
-                background-color: var(--light-actionbar-background-color);
-                color: var(--light-main-foreground-color);
-            }
-
-            &:hover > a,
-            &.focus > a,
-            > a:focus {
-                background-color: var(--light-actionbar-highlight-color);
-            }
-        }
     }
 }
 </style>

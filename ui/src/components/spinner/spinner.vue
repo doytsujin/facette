@@ -1,60 +1,33 @@
 <template>
-    <div class="v-spinner" v-if="loading">
-        <vue-simple-spinner :line-bg-color="bgColor" :line-fg-color="fgColor" :line-size="lineSize"
-            :size="size"></vue-simple-spinner>
-    </div>
+    <vue-simple-spinner class="v-spinner" :line-bg-color="backgroundColor" :line-fg-color="color" :line-size="lineSize"
+        :size="size"></vue-simple-spinner>
 </template>
 
 <script>
 import vue from "vue";
-import vueSpinner from "vue-simple-spinner";
+import vueSimpleSpinner from "vue-simple-spinner";
 
-vue.component(vueSpinner.name, vueSpinner);
+vue.component(vueSimpleSpinner.name, vueSimpleSpinner);
 
 export default {
     name: "v-spinner",
     props: {
+        backgroundColor: {
+            default: "var(--spinner-background-color)",
+            type: String,
+        },
+        color: {
+            default: "var(--spinner-color)",
+            type: String,
+        },
         lineSize: {
-            default: 4,
+            default: 3,
             type: Number,
         },
-        loading: Boolean,
         size: {
-            default: 64,
+            default: 32,
             type: Number,
         },
-    },
-    data() {
-        return {
-            bgColor: null,
-            fgColor: null,
-        };
-    },
-    methods: {
-        updateColors() {
-            let style = getComputedStyle(document.body);
-
-            Object.assign(this, {
-                bgColor: style.getPropertyValue(`--${this.$store.state.theme}-spinner-background-color`),
-                fgColor: style.getPropertyValue("--color-blue"),
-            });
-        },
-    },
-    created() {
-        this.updateColors();
     },
 };
 </script>
-
-<style lang="scss" scoped>
-.v-spinner {
-    align-items: center;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-</style>

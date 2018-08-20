@@ -1,3 +1,5 @@
-import "./common.css";
-import "./dark.css";
-import "./light.css";
+import light from "./light";
+
+export default {
+    light,
+};

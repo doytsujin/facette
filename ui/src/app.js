@@ -1,14 +1,16 @@
 import vue from "vue";
+import vueResource from "vue-resource";
+
+import "element-qsa-scope";
 
 import i18n from "./i18n";
 import router from "./router";
 import store from "./store";
 
 import "./components";
-import "./eventbus";
-import "./extend";
-import "./filters";
-import "./resource";
+import "./events";
+
+vue.use(vueResource);
 
 new vue({
     el: "router-view",

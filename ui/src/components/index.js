@@ -1,27 +1,13 @@
-// Layout components
 import "./app";
-import "./actionbar";
-import "./content";
-import "./modal";
-import "./notifier";
-import "./sidebar";
-import "./sidepane";
-import "./toolbar";
-
-// Base components
 import "./button";
-import "./checkbox";
-import "./draggable";
+import "./content";
 import "./dropdown";
-import "./form";
+import "./flex";
 import "./graph";
 import "./icon";
-import "./input";
-import "./list";
+import "./label";
 import "./message";
-import "./paging";
-import "./select";
-import "./spacer";
+import "./separator";
+import "./sidebar";
 import "./spinner";
-import "./tabset";
-import "./tooltip";
+import "./toolbar";

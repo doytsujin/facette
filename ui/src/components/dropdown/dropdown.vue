@@ -1,5 +1,5 @@
 <template>
-    <div class="v-dropdown" :class="`v-dropdown-${placement}`">
+    <div class="v-dropdown" :class="placement">
         <slot></slot>
     </div>
 </template>
@@ -18,102 +18,72 @@ export default {
 
 <style lang="scss" scoped>
 .v-dropdown {
+    background-color: var(--app-background-color);
     border-radius: 0.2rem;
-    box-sizing: border-box;
+    box-shadow: 0 0.15rem 0.5rem var(--dropdown-box-shadow-color);
+    color: var(--app-color);
     cursor: default;
     line-height: 2rem;
     padding: 0.35rem 0;
     position: absolute;
-    z-index: 150;
+    z-index: 200;
 
-    &.v-dropdown-left,
-    &.v-dropdown-right {
+    &.left,
+    &.right {
         top: 100%;
     }
 
-    &.v-dropdown-left {
+    &.left {
         right: 0;
     }
 
-    &.v-dropdown-right {
+    &.right {
         left: 0;
     }
 
-    &.v-dropdown-left .v-dropdown,
-    &.v-dropdown-right .v-dropdown {
+    &.left .v-dropdown,
+    &.right .v-dropdown {
         top: -0.35rem;
     }
 
-    &.v-dropdown-left .v-dropdown {
+    &.left .v-dropdown {
         left: auto;
         right: 100%;
     }
 
-    &.v-dropdown-right .v-dropdown {
+    &.right .v-dropdown {
         left: 100%;
         right: auto;
     }
 
     .v-button {
         display: block;
+        line-height: 1.75rem;
 
-        /deep/ > a {
-            border: none;
+        /deep/ a {
             border-radius: 0;
 
-            .v-icon {
+            &:focus,
+            &:hover {
+                background-color: var(--dropdown-focus-background-color);
+                color: var(--dropdown-focus-color);
+            }
+
+            > .v-icon {
+                text-align: center;
                 width: 1.5rem;
             }
-
-            .v-caret {
-                font-size: 1.1rem;
-                opacity: 0.5;
-            }
         }
 
-        &:hover /deep/ > a,
-        &.focus /deep/ > a,
-        /deep/ > a:focus {
-            .v-caret {
-                opacity: 0.75;
-            }
-        }
-    }
-}
-
-body {
-    &.dark .v-dropdown .v-button,
-    &.light .v-dropdown .v-button {
-        /deep/ > a {
-            background-color: transparent;
-        }
-
-        &:hover /deep/ > a,
-        &.focus /deep/ > a,
-        /deep/ > a:focus {
-            background-color: var(--color-blue);
-            color: var(--color-white);
+        & + .v-button {
+            margin: 0;
         }
     }
 
-    &.dark .v-dropdown {
-        background-color: var(--dark-dropdown-background-color);
-        box-shadow: var(--dark-dropdown-shadow);
-        color: var(--dark-dropdown-foreground-color);
-
-        .v-button /deep/ > a {
-            color: var(--dark-main-foreground-color);
-        }
-    }
-
-    &.light .v-dropdown {
-        background-color: var(--light-dropdown-background-color);
-        box-shadow: var(--light-dropdown-shadow);
-        color: var(--light-dropdown-foreground-color);
-
-        .v-button /deep/ > a {
-            color: var(--light-main-foreground-color);
-        }
+    .v-separator {
+        background-color: var(--dropdown-separator-background-color);
+        height: 1px;
+        margin: 0.35rem 0;
     }
 }
 </style>

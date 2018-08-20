@@ -66,6 +66,7 @@ export default {
     }
 
     th {
+        color: pink;
         font-weight: normal;
     }
 
@@ -80,20 +81,6 @@ export default {
             height: 0.8rem;
             margin-right: 0.5rem;
             width: 1rem;
-        }
-    }
-}
-
-body {
-    &.dark .v-graph-legend {
-        th {
-            color: var(--dark-tooltip-foreground-color-medium);
-        }
-    }
-
-    &.light .v-graph-legend {
-        th {
-            color: var(--light-tooltip-foreground-color-medium);
         }
     }
 }

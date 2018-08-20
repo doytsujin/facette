@@ -1,4 +1,5 @@
 import vue from "vue";
+
 import cursor from "./cursor";
 import graph from "./graph";
 import legend from "./legend";

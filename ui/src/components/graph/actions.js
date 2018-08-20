@@ -100,7 +100,7 @@ export default {
     },
 
     propagate() {
-        this.$eventbus.$emit("graph-action", "applyRange", pickRange(this.options));
+        this.$events.$emit("graph-action", "applyRange", pickRange(this.options));
     },
 
     setRange(range = null) {

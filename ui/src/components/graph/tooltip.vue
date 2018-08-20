@@ -107,7 +107,7 @@ export default {
 
 <style lang="scss" scoped>
 .v-graph-tooltip {
-    background-color: rgba(0, 255, 255, 0.9);
+    background-color: cyan;
     border-radius: 0.2rem;
     display: none;
     font-size: 0.9rem;
@@ -150,30 +150,6 @@ export default {
         margin-right: 0.25rem;
         vertical-align: middle;
         width: 0.75rem;
-    }
-}
-
-body {
-    &.dark .v-graph-tooltip {
-        background-color: var(--dark-tooltip-background-color);
-        color: var(--dark-tooltip-foreground-color);
-
-        thead th,
-        tfoot th,
-        tbody tr.null td {
-            color: var(--dark-tooltip-foreground-color-medium);
-        }
-    }
-
-    &.light .v-graph-tooltip {
-        background-color: var(--light-tooltip-background-color);
-        color: var(--light-tooltip-foreground-color);
-
-        thead th,
-        tfoot th,
-        tbody tr.null td {
-            color: var(--light-tooltip-foreground-color-medium);
-        }
     }
 }
 </style>

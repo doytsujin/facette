@@ -154,22 +154,4 @@ export default {
         transform: translateX(0);
     }
 }
-
-body {
-    &.dark .v-graph-slides {
-        .v-button:hover /deep/ > a,
-        .v-button.focus /deep/ > a,
-        .v-button /deep/ > a:focus {
-            background-color: var(--dark-main-foreground-color-light);
-        }
-    }
-
-    &.light .v-graph-slides {
-        .v-button:hover /deep/ > a,
-        .v-button.focus /deep/ > a,
-        .v-button /deep/ > a:focus {
-            background-color: var(--light-main-foreground-color-light);
-        }
-    }
-}
 </style>
